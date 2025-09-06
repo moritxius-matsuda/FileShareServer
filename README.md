@@ -29,6 +29,9 @@ The application creates a local HTTP server that serves the selected file at:
 
 Other devices on the same network can access the file using your computer's IP address instead of localhost.
 
+<img width="498" height="354" alt="grafik" src="https://github.com/user-attachments/assets/1bb7636f-88c8-4d3e-9773-5045359f7c05" />
+<img width="431" height="238" alt="grafik" src="https://github.com/user-attachments/assets/f5a45d38-387e-41f9-99fa-50ae6dc62f6b" />
+
 ## Supported File Types
 
 basically any file extension
