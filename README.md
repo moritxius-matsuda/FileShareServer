@@ -17,7 +17,7 @@ A simple Java application to easily share files via HTTP server.
 ## Usage
 
 ### Direct Execution
-1. Double-click `FileShare.exe`
+1. Double-click `FileShare.exe` or on Linux just use the .jar file
 2. Select file in the dialog
 3. Server starts
 
