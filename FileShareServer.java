@@ -14,11 +14,10 @@ public class FileShareServer {
     private static String fileName;
     
     public static void main(String[] args) {
-        // Wenn keine Argumente übergeben wurden, öffne Datei-Dialog
         if (args.length == 0) {
             sharedFilePath = selectFile();
             if (sharedFilePath == null) {
-                return; // Benutzer hat abgebrochen
+                return;
             }
         } else {
             sharedFilePath = args[0];
@@ -45,7 +44,6 @@ public class FileShareServer {
         fileChooser.setDialogTitle("Datei zum Teilen auswählen");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         
-        // Home-Verzeichnis als Startpunkt
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
         
         int result = fileChooser.showOpenDialog(null);
@@ -54,7 +52,7 @@ public class FileShareServer {
             return fileChooser.getSelectedFile().getAbsolutePath();
         }
         
-        return null; // Benutzer hat abgebrochen
+        return null;
     }
     
     private static void startServer() throws IOException {
@@ -224,4 +222,5 @@ public class FileShareServer {
     private static void showError(String message) {
         JOptionPane.showMessageDialog(null, message, "Fehler", JOptionPane.ERROR_MESSAGE);
     }
+
 }
