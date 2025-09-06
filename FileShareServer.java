@@ -16,14 +16,12 @@ public class FileShareServer {
     private static boolean isGerman;
     
     public static void main(String[] args) {
-        // Sprache basierend auf System-Locale bestimmen
         isGerman = Locale.getDefault().getLanguage().equals("de");
         
-        // Wenn keine Argumente übergeben wurden, öffne Datei-Dialog
         if (args.length == 0) {
             sharedFilePath = selectFile();
             if (sharedFilePath == null) {
-                return; // Benutzer hat abgebrochen
+                return;
             }
         } else {
             sharedFilePath = args[0];
@@ -99,7 +97,7 @@ public class FileShareServer {
             return fileChooser.getSelectedFile().getAbsolutePath();
         }
         
-        return null; // Benutzer hat abgebrochen
+        return null;
     }
     
     private static void startServer() throws IOException {
@@ -269,4 +267,5 @@ public class FileShareServer {
     private static void showError(String message) {
         JOptionPane.showMessageDialog(null, message, getText("error"), JOptionPane.ERROR_MESSAGE);
     }
+
 }
