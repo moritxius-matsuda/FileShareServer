@@ -7,7 +7,7 @@ A simple Java application to easily share files via HTTP server.
 - **HTTP server on port 8181**
 - **Multi-language support** (German/English based on system locale)
 - **Simple GUI**
-- **File size display**
+- **Serve your file via HTTP**
 
 ## Requirements
 
