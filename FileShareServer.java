@@ -7,17 +7,23 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.net.URI;
 import javax.swing.*;
+import java.util.Locale;
 
 public class FileShareServer {
     private static HttpServer server;
     private static String sharedFilePath;
     private static String fileName;
+    private static boolean isGerman;
     
     public static void main(String[] args) {
+        // Sprache basierend auf System-Locale bestimmen
+        isGerman = Locale.getDefault().getLanguage().equals("de");
+        
+        // Wenn keine Argumente übergeben wurden, öffne Datei-Dialog
         if (args.length == 0) {
             sharedFilePath = selectFile();
             if (sharedFilePath == null) {
-                return;
+                return; // Benutzer hat abgebrochen
             }
         } else {
             sharedFilePath = args[0];
@@ -26,7 +32,7 @@ public class FileShareServer {
         File file = new File(sharedFilePath);
         
         if (!file.exists()) {
-            showError("Datei existiert nicht: " + sharedFilePath);
+            showError(getText("fileNotExists") + ": " + sharedFilePath);
             return;
         }
         
@@ -35,15 +41,56 @@ public class FileShareServer {
         try {
             startServer();
         } catch (Exception e) {
-            showError("Fehler beim Starten des Servers: " + e.getMessage());
+            showError(getText("serverStartError") + ": " + e.getMessage());
+        }
+    }
+    
+    private static String getText(String key) {
+        if (isGerman) {
+            switch (key) {
+                case "selectFile": return "Datei zum Teilen auswählen";
+                case "fileNotExists": return "Datei existiert nicht";
+                case "serverStartError": return "Fehler beim Starten des Servers";
+                case "serverStarted": return "Server gestartet!";
+                case "file": return "Datei";
+                case "size": return "Größe";
+                case "server": return "Server";
+                case "downloadFile": return "Datei herunterladen";
+                case "urlCopied": return "Die Download-URL wurde in die Zwischenablage kopiert!";
+                case "serverInfo": return "Server läuft auf Port 8181. Zum Beenden dieses Fenster schließen.";
+                case "stopServer": return "Server stoppen";
+                case "error": return "Fehler";
+                case "fileNotFound": return "Datei nicht gefunden!";
+                case "fileSharing": return "File Sharing Server";
+                default: return key;
+            }
+        } else {
+            switch (key) {
+                case "selectFile": return "Select file to share";
+                case "fileNotExists": return "File does not exist";
+                case "serverStartError": return "Error starting server";
+                case "serverStarted": return "Server started!";
+                case "file": return "File";
+                case "size": return "Size";
+                case "server": return "Server";
+                case "downloadFile": return "Download file";
+                case "urlCopied": return "Download URL copied to clipboard!";
+                case "serverInfo": return "Server running on port 8181. Close this window to stop.";
+                case "stopServer": return "Stop server";
+                case "error": return "Error";
+                case "fileNotFound": return "File not found!";
+                case "fileSharing": return "File Sharing Server";
+                default: return key;
+            }
         }
     }
     
     private static String selectFile() {
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Datei zum Teilen auswählen");
+        fileChooser.setDialogTitle(getText("selectFile"));
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         
+        // Home-Verzeichnis als Startpunkt
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
         
         int result = fileChooser.showOpenDialog(null);
@@ -52,7 +99,7 @@ public class FileShareServer {
             return fileChooser.getSelectedFile().getAbsolutePath();
         }
         
-        return null;
+        return null; // Benutzer hat abgebrochen
     }
     
     private static void startServer() throws IOException {
@@ -75,7 +122,7 @@ public class FileShareServer {
         try {
             Desktop.getDesktop().browse(new URI(url));
         } catch (Exception e) {
-            System.err.println("Konnte Browser nicht öffnen: " + e.getMessage());
+            System.err.println("Could not open browser: " + e.getMessage());
         }
     }
     
@@ -84,7 +131,7 @@ public class FileShareServer {
             File file = new File(sharedFilePath);
             
             if (!file.exists()) {
-                String response = "Datei nicht gefunden!";
+                String response = getText("fileNotFound");
                 exchange.sendResponseHeaders(404, response.length());
                 OutputStream os = exchange.getResponseBody();
                 os.write(response.getBytes());
@@ -129,7 +176,7 @@ public class FileShareServer {
         
         return "<!DOCTYPE html>" +
                "<html><head><meta charset='UTF-8'>" +
-               "<title>File Sharing Server</title>" +
+               "<title>" + getText("fileSharing") + "</title>" +
                "<style>body{font-family:Arial,sans-serif;margin:40px;background:#f5f5f5}" +
                ".container{background:white;padding:30px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1)}" +
                ".download-btn{background:#007bff;color:white;padding:12px 24px;text-decoration:none;border-radius:4px;display:inline-block;margin:10px 0}" +
@@ -137,15 +184,15 @@ public class FileShareServer {
                ".info{background:#e9ecef;padding:15px;border-radius:4px;margin:15px 0}" +
                "</style></head><body>" +
                "<div class='container'>" +
-               "<h1>File Sharing Server</h1>" +
+               "<h1>📁 " + getText("fileSharing") + "</h1>" +
                "<div class='info'>" +
-               "<strong>Datei:</strong> " + fileName + "<br>" +
-               "<strong>Größe:</strong> " + fileSizeStr + "<br>" +
-               "<strong>Server:</strong> http://localhost:8181" +
+               "<strong>" + getText("file") + ":</strong> " + fileName + "<br>" +
+               "<strong>" + getText("size") + ":</strong> " + fileSizeStr + "<br>" +
+               "<strong>" + getText("server") + ":</strong> http://localhost:8181" +
                "</div>" +
-               "<a href='/download' class='download-btn'>Datei herunterladen</a>" +
-               "<p><small>Die Download-URL wurde in die Zwischenablage kopiert!</small></p>" +
-               "<p><small>Server läuft auf Port 8181. Zum Beenden dieses Fenster schließen.</small></p>" +
+               "<a href='/download' class='download-btn'>📥 " + getText("downloadFile") + "</a>" +
+               "<p><small>" + getText("urlCopied") + "</small></p>" +
+               "<p><small>" + getText("serverInfo") + "</small></p>" +
                "</div></body></html>";
     }
     
@@ -172,7 +219,7 @@ public class FileShareServer {
     }
     
     private static void showNotification(String url) {
-        JFrame frame = new JFrame("File Sharing Server");
+        JFrame frame = new JFrame(getText("fileSharing"));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(450, 250);
         frame.setLocationRelativeTo(null);
@@ -181,21 +228,21 @@ public class FileShareServer {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
-        JLabel titleLabel = new JLabel("Server gestartet!");
+        JLabel titleLabel = new JLabel("🌐 " + getText("serverStarted"));
         titleLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        JLabel fileLabel = new JLabel("Datei: " + fileName);
+        JLabel fileLabel = new JLabel(getText("file") + ": " + fileName);
         fileLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         JLabel urlLabel = new JLabel("URL: " + url);
         urlLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        JLabel clipboardLabel = new JLabel("Download-URL in Zwischenablage kopiert!");
+        JLabel clipboardLabel = new JLabel("📋 " + getText("urlCopied"));
         clipboardLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         clipboardLabel.setFont(new Font(Font.SANS_SERIF, Font.ITALIC, 12));
         
-        JButton stopButton = new JButton("Server stoppen");
+        JButton stopButton = new JButton(getText("stopServer"));
         stopButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         stopButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -220,7 +267,6 @@ public class FileShareServer {
     }
     
     private static void showError(String message) {
-        JOptionPane.showMessageDialog(null, message, "Fehler", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(null, message, getText("error"), JOptionPane.ERROR_MESSAGE);
     }
-
 }
